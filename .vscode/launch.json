@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "lldb",
+      "request": "launch",
+      "args": [],
+      "cwd": "/Users/davidjiang/Alveo_U55C_HPC_ERI/helloWold",
+      "program": "/Users/davidjiang/Alveo_U55C_HPC_ERI/helloWold/build/Debug/outDebug"
+    }
+  ]
+}
