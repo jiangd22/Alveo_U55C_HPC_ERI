@@ -1,0 +1,4 @@
+module hellowold;
+initial
+	$display ("Hello World !");
+endmodule
