@@ -63,11 +63,11 @@ int main() {
     hrr_ssss(ab, cd, I_ssss);
     std::cout << I_ssss[0] << std::endl;
 
-    double I_psss[3];
-    hrr_psss(ab, cd, I_psss);
-    std::cout << I_psss[0] << std::endl;
-    std::cout << I_psss[1] << std::endl;
-    std::cout << I_psss[2] << std::endl;
+    // double I_psss[3];
+    // hrr_psss(ab, cd, I_psss);
+    // std::cout << I_psss[0] << std::endl;
+    // std::cout << I_psss[1] << std::endl;
+    // std::cout << I_psss[2] << std::endl;
 
 
     return 0;
