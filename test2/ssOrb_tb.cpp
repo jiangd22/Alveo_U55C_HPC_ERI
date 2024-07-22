@@ -7,10 +7,10 @@ int main() {
 
     int la = 0;
     int lb = 0; // angular momentum
-    int na = 0;
-    int nb = 0; // number of shells
-    int ma = 0;
-    int mb = 0; // number of primitives
+    int na = 2;
+    int nb = 3; // number of shells
+    int ma = 1;
+    int mb = 1; // number of primitives
     std::array<double, 6> Z = {6.342, 6.29243, 13.0011, 6.33731, 6.94737, 6.4369}; // zeta_a + zeta_b
     std::array<double, 6> ZA = {6.342, 6.29243, 13.0011, 6.33731, 6.94737, 6.4369}; // zeta_a
     std::array<double, 6> K = {0.110144, 0.00938326, 0.00124135, 0.203043, 0.0265948, 0.0490335}; // kappa constant
@@ -34,7 +34,6 @@ int main() {
 
     double I_ssss[1];
     hrr_ssss(   la, lb, na, nb, ma, mb, Z, ZA, K, S, idx, P, PA, AB, 
-                la, lb, na, nb, ma, mb, Z, ZA, K, S, idx, P, PA, AB,
                 I_ssss);
     std::cout << I_ssss[0] << std::endl;
 

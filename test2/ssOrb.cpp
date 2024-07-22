@@ -2,43 +2,117 @@
 #include <cmath>
 #include <array>
 
-void hrr_ssss(  int AB_la, int AB_lb, int AB_na, int AB_nb, int AB_ma, int AB_mb, std::array<double, 6> AB_Z, std::array<double, 6> AB_ZA, std::array<double, 6> AB_K, std::array<double, 6> AB_S, std::array<std::array<int,2>,2> AB_idx, std::array<std::array<double,6>,3> AB_P, std::array<std::array<double,6>,3> AB_PA, std::array<std::array<double,6>,3> AB_AB,
-                int CD_la, int CD_lb, int CD_na, int CD_nb, int CD_ma, int CD_mb, std::array<double, 6> CD_Z, std::array<double, 6> CD_ZA, std::array<double, 6> CD_K, std::array<double, 6> CD_S, std::array<std::array<int,2>,2> CD_idx, std::array<std::array<double,6>,3> CD_P, std::array<std::array<double,6>,3> CD_PA, std::array<std::array<double,6>,3> CD_AB,
+void hrr_ssss(  int la, int lb, int na, int nb, int ma, int mb, std::array<double, 6> Z, std::array<double, 6> ZA, std::array<double, 6> K, std::array<double, 6> S, std::array<std::array<int,2>,2> idx, std::array<std::array<double,6>,3> P, std::array<std::array<double,6>,3> PA, std::array<std::array<double,6>,3> AB,
+                
                 double* I_ ) {
 
-    #pragma HLS INTERFACE m_axi port=I_ offset=slave bundle=gmem
-    #pragma HLS INTERFACE s_axilite port=AB_la bundle=control
-    #pragma HLS INTERFACE s_axilite port=AB_lb bundle=control
-    #pragma HLS INTERFACE s_axilite port=AB_na bundle=control
-    #pragma HLS INTERFACE s_axilite port=AB_nb bundle=control
-    #pragma HLS INTERFACE s_axilite port=AB_ma bundle=control
-    #pragma HLS INTERFACE s_axilite port=AB_mb bundle=control
-    #pragma HLS INTERFACE s_axilite port=AB_Z bundle=control
-    #pragma HLS INTERFACE s_axilite port=AB_ZA bundle=control
-    #pragma HLS INTERFACE s_axilite port=AB_K bundle=control
-    #pragma HLS INTERFACE s_axilite port=AB_S bundle=control
-    #pragma HLS INTERFACE s_axilite port=AB_idx bundle=control
-    #pragma HLS INTERFACE s_axilite port=AB_P bundle=control
-    #pragma HLS INTERFACE s_axilite port=AB_PA bundle=control
-    #pragma HLS INTERFACE s_axilite port=AB_AB bundle=control
+#pragma HLS INTERFACE m_axi port=I_ offset=slave bundle=gmem1 max_read_burst_length=256 max_write_burst_length=256 depth= 1
+// ab
+// scaler inputs
+#pragma HLS INTERFACE s_axilite port=la 
+#pragma HLS INTERFACE s_axilite port=lb 
+#pragma HLS INTERFACE s_axilite port=na 
+#pragma HLS INTERFACE s_axilite port=nb 
+#pragma HLS INTERFACE s_axilite port=ma 
+#pragma HLS INTERFACE s_axilite port=mb
+// array inputs
+#pragma HLS INTERFACE m_axi port=Z  offset=slave bundle=gmem2 max_read_burst_length=256 max_write_burst_length=256 depth= 6  
+#pragma HLS INTERFACE s_axilite port=Z 
+#pragma HLS INTERFACE m_axi port=ZA offset=slave bundle=gmem3 max_read_burst_length=256 max_write_burst_length=256 depth= 6
+#pragma HLS INTERFACE s_axilite port=ZA 
+#pragma HLS INTERFACE m_axi port=K  offset=slave bundle=gmem4 max_read_burst_length=256 max_write_burst_length=256 depth= 6
+#pragma HLS INTERFACE s_axilite port=K 
+#pragma HLS INTERFACE m_axi port=S  offset=slave bundle=gmem5 max_read_burst_length=256 max_write_burst_length=256 depth= 6
+#pragma HLS INTERFACE s_axilite port=S 
+#pragma HLS INTERFACE m_axi port=idx  offset=slave bundle=gmem6 max_read_burst_length=256 max_write_burst_length=256 depth= 4
+#pragma HLS INTERFACE s_axilite port=idx 
+// 2d array inputs
+#pragma HLS INTERFACE m_axi port=P  offset=slave bundle=gmem7 max_read_burst_length=256 max_write_burst_length=256 depth= 18
+#pragma HLS INTERFACE s_axilite port=P
+#pragma HLS INTERFACE m_axi port=PA offset=slave bundle=gmem8 max_read_burst_length=256 max_write_burst_length=256 depth= 18
+#pragma HLS INTERFACE s_axilite port=PA 
+#pragma HLS INTERFACE m_axi port=AB offset=slave bundle=gmem9 max_read_burst_length=256 max_write_burst_length=256 depth= 18
+#pragma HLS INTERFACE s_axilite port=AB 
 
-    #pragma HLS INTERFACE s_axilite port=CD_la bundle=control
-    #pragma HLS INTERFACE s_axilite port=CD_lb bundle=control
-    #pragma HLS INTERFACE s_axilite port=CD_na bundle=control
-    #pragma HLS INTERFACE s_axilite port=CD_nb bundle=control
-    #pragma HLS INTERFACE s_axilite port=CD_ma bundle=control
-    #pragma HLS INTERFACE s_axilite port=CD_mb bundle=control
-    #pragma HLS INTERFACE s_axilite port=CD_Z bundle=control
-    #pragma HLS INTERFACE s_axilite port=CD_ZA bundle=control
-    #pragma HLS INTERFACE s_axilite port=CD_K bundle=control
-    #pragma HLS INTERFACE s_axilite port=CD_S bundle=control
-    #pragma HLS INTERFACE s_axilite port=CD_idx bundle=control
-    #pragma HLS INTERFACE s_axilite port=CD_P bundle=control
-    #pragma HLS INTERFACE s_axilite port=CD_PA bundle=control
-    #pragma HLS INTERFACE s_axilite port=CD_AB bundle=control
 
-    #pragma HLS INTERFACE s_axilite port=return bundle=control
+#pragma HLS INTERFACE s_axilite port=return
 
+    int AB_la;
+    int AB_lb;
+    int AB_na;
+    int AB_nb;
+    int AB_ma;
+    int AB_mb; 
+    double AB_Z[6]; // zeta_a + zeta_b
+    double AB_ZA[6]; // zeta_a
+    double AB_K[6]; // kappa constant
+    double AB_S[6]; // Schwarz factor sPrt[(ab|ab)]
+    int AB_idx[2][2]; // shell indices (a and b)
+    double AB_P[3][6]; // zeta_a*A + zeta_b*B / (zeta_a + zeta_b)
+    double AB_PA[3][6]; // P - A
+    double AB_AB[3][6]; // A - B
+
+    int CD_la;
+    int CD_lb;
+    int CD_na;
+    int CD_nb;
+    int CD_ma;
+    int CD_mb; 
+    double CD_Z[6]; // zeta_a + zeta_b
+    double CD_ZA[6]; // zeta_a
+    double CD_K[6]; // kappa constant
+    double CD_S[6]; // Schwarz factor sPrt[(ab|ab)]
+    int CD_idx[2][2]; // shell indices (a and b)
+    double CD_P[3][6]; // zeta_a*A + zeta_b*B / (zeta_a + zeta_b)
+    double CD_PA[3][6]; // P - A
+    double CD_AB[3][6]; // A - B
+    
+    AB_la = la;
+    AB_lb = lb;
+    AB_na = na;
+    AB_nb = nb;
+    AB_ma = ma;
+    AB_mb = mb;
+    CD_la = la;
+    CD_lb = lb;
+    CD_na = na;
+    CD_nb = nb;
+    CD_ma = ma;
+    CD_mb = mb;
+
+    for (int i = 0; i < 6; i++) {
+        AB_Z[i] = Z[i];
+        AB_ZA[i] = ZA[i];
+        AB_K[i] = K[i];
+        AB_S[i] = S[i];
+
+        CD_Z[i] = Z[i];
+        CD_ZA[i] = ZA[i];
+        CD_K[i] = K[i];
+        CD_S[i] = S[i];
+    }
+
+    for (int i = 0; i < 2; i++) {
+        for (int j = 0; j < 2; j++) {
+            AB_idx[i][j] = idx[i][j];
+            CD_idx[i][j] = idx[i][j];
+        }
+    }
+
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 6; j++) {
+            AB_P[i][j] = P[i][j];
+            AB_PA[i][j] = PA[i][j];
+            AB_AB[i][j] = AB[i][j];
+
+            CD_P[i][j] = P[i][j];
+            CD_PA[i][j] = PA[i][j];
+            CD_AB[i][j] = AB[i][j];
+        }
+    }
+
+
+    
     int nab = AB_na * AB_nb;
     int ncd = CD_na * CD_nb; 
     for (int idx = 0; idx < nab; idx++) {
