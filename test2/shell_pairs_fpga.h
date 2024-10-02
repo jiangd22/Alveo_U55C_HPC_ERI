@@ -12,7 +12,7 @@ const int MAX_PRIMITIVES = 50;
 // {
 //     int la, lb; // angular momentum
 //     int na, nb; // number of shells
-//     int ma, mb; // number of primitives
+//     int ma, mb; // number of primitivesa
 //     std::vector<double> Z; // zeta_a + zeta_b
 //     std::vector<double> ZA; // zeta_a
 //     std::vector<double> K; // kappa constant
