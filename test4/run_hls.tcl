@@ -15,16 +15,16 @@
 # limitations under the License.
 
 # Create a project
-open_project -reset ssOrb
+open_project -reset spOrb
 
 # Add design files
-add_files ssOrb.cpp
+add_files spOrb.cpp
 
 # Add test bench & files
-add_files -tb ssOrb_tb.cpp
+add_files -tb spOrb_tb.cpp
 
 # Add top level function
-set_top hrr_ssss
+set_top driver
 
 
 # ########################################################
