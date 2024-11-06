@@ -1,38 +1,90 @@
-#include "ssOrb.h"
+#include "spOrb.h"
 #include <cmath>
 #include <array>
+#include <cstdio>
+#include <string>
 
-void hrr_ssss(  int la, int lb, int na, int nb, int ma, int mb, std::array<double, 6> Z, std::array<double, 6> ZA, std::array<double, 6> K, std::array<double, 6> S, std::array<std::array<int,2>,2> idx, std::array<std::array<double,6>,3> P, std::array<std::array<double,6>,3> PA, std::array<std::array<double,6>,3> AB,
+void orb ( char* type,  int la, int lb, int na, int nb, int ma, int mb, std::array<double, 6> Z, std::array<double, 6> ZA, std::array<double, 6> K, std::array<double, 6> S, std::array<std::array<int,2>,2> idx, std::array<std::array<double,6>,3> P, std::array<std::array<double,6>,3> PA, std::array<std::array<double,6>,3> AB,
+            double* I_) { 
+    if (type == "ssss"){
+        hrr_ssss(la, lb, na, nb, ma, mb, Z, ZA, K, S, idx, P, PA, AB, I_);
+    } else if (type == "psss"){
+        hrr_psss(la, lb, na, nb, ma, mb, Z, ZA, K, S, idx, P, PA, AB, I_);
+    } else if (type == "psps"){
+        hrr_psps(la, lb, na, nb, ma, mb, Z, ZA, K, S, idx, P, PA, AB, I_);
+    } else if (type == "ppss"){
+        hrr_ppss(la, lb, na, nb, ma, mb, Z, ZA, K, S, idx, P, PA, AB, I_);
+    } else if (type == "ppps"){
+        hrr_ppps(la, lb, na, nb, ma, mb, Z, ZA, K, S, idx, P, PA, AB, I_);
+    } else if (type == "pppp"){
+        hrr_pppp(la, lb, na, nb, ma, mb, Z, ZA, K, S, idx, P, PA, AB, I_);
+    } else {
+        printf("Invalid type\n");
+    }                 
+}
+
+
+void hrr_ssss(  int la, int lb, int na, int nb, int ma, int mb, std::array<double, 6> abZ, std::array<double, 6> abZA, std::array<double, 6> abK, std::array<double, 6> abS, std::array<std::array<int,2>,2> abidx, std::array<std::array<double,6>,3> abP, std::array<std::array<double,6>,3> abPA, std::array<std::array<double,6>,3> abAB,
+                int lc, int ld, int nc, int nd, int mc, int md, std::array<double, 6> cdZ, std::array<double, 6> cdZA, std::array<double, 6> cdK, std::array<double, 6> cdS, std::array<std::array<int,2>,2> cdidx, std::array<std::array<double,6>,3> cdP, std::array<std::array<double,6>,3> cdPA, std::array<std::array<double,6>,3> cdAB,
                 double* I_ ) {
 
 #pragma HLS INTERFACE m_axi port=I_ offset=slave bundle=gmem1 max_read_burst_length=256 max_write_burst_length=256 depth= 1
-// ab
+
 // scaler inputs
+// ab
 #pragma HLS INTERFACE s_axilite port=la 
 #pragma HLS INTERFACE s_axilite port=lb 
 #pragma HLS INTERFACE s_axilite port=na 
 #pragma HLS INTERFACE s_axilite port=nb 
 #pragma HLS INTERFACE s_axilite port=ma 
 #pragma HLS INTERFACE s_axilite port=mb
-// array inputs
-#pragma HLS INTERFACE m_axi port=Z  offset=slave bundle=gmem2 max_read_burst_length=256 max_write_burst_length=256 depth= 6  
-#pragma HLS INTERFACE s_axilite port=Z 
-#pragma HLS INTERFACE m_axi port=ZA offset=slave bundle=gmem3 max_read_burst_length=256 max_write_burst_length=256 depth= 6
-#pragma HLS INTERFACE s_axilite port=ZA 
-#pragma HLS INTERFACE m_axi port=K  offset=slave bundle=gmem4 max_read_burst_length=256 max_write_burst_length=256 depth= 6
-#pragma HLS INTERFACE s_axilite port=K 
-#pragma HLS INTERFACE m_axi port=S  offset=slave bundle=gmem5 max_read_burst_length=256 max_write_burst_length=256 depth= 6
-#pragma HLS INTERFACE s_axilite port=S 
-#pragma HLS INTERFACE m_axi port=idx  offset=slave bundle=gmem6 max_read_burst_length=256 max_write_burst_length=256 depth= 4
-#pragma HLS INTERFACE s_axilite port=idx 
-// 2d array inputs
-#pragma HLS INTERFACE m_axi port=P  offset=slave bundle=gmem7 max_read_burst_length=256 max_write_burst_length=256 depth= 18
-#pragma HLS INTERFACE s_axilite port=P
-#pragma HLS INTERFACE m_axi port=PA offset=slave bundle=gmem8 max_read_burst_length=256 max_write_burst_length=256 depth= 18
-#pragma HLS INTERFACE s_axilite port=PA 
-#pragma HLS INTERFACE m_axi port=AB offset=slave bundle=gmem9 max_read_burst_length=256 max_write_burst_length=256 depth= 18
-#pragma HLS INTERFACE s_axilite port=AB 
+// cd
+#pragma HLS INTERFACE s_axilite port=lc 
+#pragma HLS INTERFACE s_axilite port=ld 
+#pragma HLS INTERFACE s_axilite port=nc 
+#pragma HLS INTERFACE s_axilite port=nd
+#pragma HLS INTERFACE s_axilite port=mc 
+#pragma HLS INTERFACE s_axilite port=md
 
+// array inputs
+// ab
+#pragma HLS INTERFACE m_axi port=abZ  offset=slave bundle=gmem2 max_read_burst_length=256 max_write_burst_length=256 depth= 6  
+#pragma HLS INTERFACE s_axilite port=abZ 
+#pragma HLS INTERFACE m_axi port=abZA offset=slave bundle=gmem3 max_read_burst_length=256 max_write_burst_length=256 depth= 6
+#pragma HLS INTERFACE s_axilite port=abZA 
+#pragma HLS INTERFACE m_axi port=abK  offset=slave bundle=gmem4 max_read_burst_length=256 max_write_burst_length=256 depth= 6
+#pragma HLS INTERFACE s_axilite port=abK 
+#pragma HLS INTERFACE m_axi port=abS  offset=slave bundle=gmem5 max_read_burst_length=256 max_write_burst_length=256 depth= 6
+#pragma HLS INTERFACE s_axilite port=abS 
+#pragma HLS INTERFACE m_axi port=abidx  offset=slave bundle=gmem6 max_read_burst_length=256 max_write_burst_length=256 depth= 4
+#pragma HLS INTERFACE s_axilite port=abidx 
+// cd
+#pragma HLS INTERFACE m_axi port=cdZ  offset=slave bundle=gmem7 max_read_burst_length=256 max_write_burst_length=256 depth= 6  
+#pragma HLS INTERFACE s_axilite port=cdZ 
+#pragma HLS INTERFACE m_axi port=cdZA offset=slave bundle=gmem8 max_read_burst_length=256 max_write_burst_length=256 depth= 6
+#pragma HLS INTERFACE s_axilite port=cdZA 
+#pragma HLS INTERFACE m_axi port=cdK  offset=slave bundle=gmem9 max_read_burst_length=256 max_write_burst_length=256 depth= 6
+#pragma HLS INTERFACE s_axilite port=cdK 
+#pragma HLS INTERFACE m_axi port=cdS  offset=slave bundle=gmem10 max_read_burst_length=256 max_write_burst_length=256 depth= 6
+#pragma HLS INTERFACE s_axilite port=cdS 
+#pragma HLS INTERFACE m_axi port=cdidx  offset=slave bundle=gmem11 max_read_burst_length=256 max_write_burst_length=256 depth= 4
+#pragma HLS INTERFACE s_axilite port=cdidx 
+
+// 2d array inputs
+// ab
+#pragma HLS INTERFACE m_axi port=adP  offset=slave bundle=gmem12 max_read_burst_length=256 max_write_burst_length=256 depth= 18
+#pragma HLS INTERFACE s_axilite port=adP
+#pragma HLS INTERFACE m_axi port=adPA offset=slave bundle=gmem13 max_read_burst_length=256 max_write_burst_length=256 depth= 18
+#pragma HLS INTERFACE s_axilite port=adPA 
+#pragma HLS INTERFACE m_axi port=adAB offset=slave bundle=gmem14 max_read_burst_length=256 max_write_burst_length=256 depth= 18
+#pragma HLS INTERFACE s_axilite port=adAB 
+// cd
+#pragma HLS INTERFACE m_axi port=cdP  offset=slave bundle=gmem15 max_read_burst_length=256 max_write_burst_length=256 depth= 18
+#pragma HLS INTERFACE s_axilite port=cdP
+#pragma HLS INTERFACE m_axi port=cdPA offset=slave bundle=gmem16 max_read_burst_length=256 max_write_burst_length=256 depth= 18
+#pragma HLS INTERFACE s_axilite port=cdPA 
+#pragma HLS INTERFACE m_axi port=cdAB offset=slave bundle=gmem17 max_read_burst_length=256 max_write_burst_length=256 depth= 18
+#pragma HLS INTERFACE s_axilite port=cdAB
 
 #pragma HLS INTERFACE s_axilite port=return
 
@@ -72,44 +124,44 @@ void hrr_ssss(  int la, int lb, int na, int nb, int ma, int mb, std::array<doubl
     AB_nb = nb;
     AB_ma = ma;
     AB_mb = mb;
-    CD_la = la;
-    CD_lb = lb;
-    CD_na = na;
-    CD_nb = nb;
-    CD_ma = ma;
-    CD_mb = mb;
+    
+    CD_la = lc;
+    CD_lb = ld;
+    CD_na = nc;
+    CD_nb = nd;
+    CD_ma = mc;
+    CD_mb = md;
 
     for (int i = 0; i < 6; i++) {
-        AB_Z[i] = Z[i];
-        AB_ZA[i] = ZA[i];
-        AB_K[i] = K[i];
-        AB_S[i] = S[i];
+        AB_Z[i] = abZ[i];
+        AB_ZA[i] = abZA[i];
+        AB_K[i] = abK[i];
+        AB_S[i] = abS[i];
 
-        CD_Z[i] = Z[i];
-        CD_ZA[i] = ZA[i];
-        CD_K[i] = K[i];
-        CD_S[i] = S[i];
+        CD_Z[i] = cdZ[i];
+        CD_ZA[i] = cdZA[i];
+        CD_K[i] = cdK[i];
+        CD_S[i] = cdS[i];
     }
 
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 2; j++) {
-            AB_idx[i][j] = idx[i][j];
-            CD_idx[i][j] = idx[i][j];
+            AB_idx[i][j] = abidx[i][j];
+            CD_idx[i][j] = cdidx[i][j];
         }
     }
 
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 6; j++) {
-            AB_P[i][j] = P[i][j];
-            AB_PA[i][j] = PA[i][j];
-            AB_AB[i][j] = AB[i][j];
+            AB_P[i][j] = abP[i][j];
+            AB_PA[i][j] = abPA[i][j];
+            AB_AB[i][j] = abAB[i][j];
 
-            CD_P[i][j] = P[i][j];
-            CD_PA[i][j] = PA[i][j];
-            CD_AB[i][j] = AB[i][j];
+            CD_P[i][j] = cdP[i][j];
+            CD_PA[i][j] = cdPA[i][j];
+            CD_AB[i][j] = cdAB[i][j];
         }
     }
-
 
     
     int nab = AB_na * AB_nb;

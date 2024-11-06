@@ -2,37 +2,67 @@
 #include <cmath>
 #include <array>
 
-void hrr_ssss(  int la, int lb, int na, int nb, int ma, int mb, std::array<double, 6> Z, std::array<double, 6> ZA, std::array<double, 6> K, std::array<double, 6> S, std::array<std::array<int,2>,2> idx, std::array<std::array<double,6>,3> P, std::array<std::array<double,6>,3> PA, std::array<std::array<double,6>,3> AB,
+void hrr_ssss(  int la, int lb, int na, int nb, int ma, int mb, std::array<double, 6> abZ, std::array<double, 6> abZA, std::array<double, 6> abK, std::array<double, 6> abS, std::array<std::array<int,2>,2> abidx, std::array<std::array<double,6>,3> abP, std::array<std::array<double,6>,3> abPA, std::array<std::array<double,6>,3> abAB,
+                int lc, int ld, int nc, int nd, int mc, int md, std::array<double, 6> cdZ, std::array<double, 6> cdZA, std::array<double, 6> cdK, std::array<double, 6> cdS, std::array<std::array<int,2>,2> cdidx, std::array<std::array<double,6>,3> cdP, std::array<std::array<double,6>,3> cdPA, std::array<std::array<double,6>,3> cdAB,
                 double* I_ ) {
 
 #pragma HLS INTERFACE m_axi port=I_ offset=slave bundle=gmem1 max_read_burst_length=256 max_write_burst_length=256 depth= 1
-// ab
+
 // scaler inputs
+// ab
 #pragma HLS INTERFACE s_axilite port=la 
 #pragma HLS INTERFACE s_axilite port=lb 
 #pragma HLS INTERFACE s_axilite port=na 
 #pragma HLS INTERFACE s_axilite port=nb 
 #pragma HLS INTERFACE s_axilite port=ma 
 #pragma HLS INTERFACE s_axilite port=mb
-// array inputs
-#pragma HLS INTERFACE m_axi port=Z  offset=slave bundle=gmem2 max_read_burst_length=256 max_write_burst_length=256 depth= 6  
-#pragma HLS INTERFACE s_axilite port=Z 
-#pragma HLS INTERFACE m_axi port=ZA offset=slave bundle=gmem3 max_read_burst_length=256 max_write_burst_length=256 depth= 6
-#pragma HLS INTERFACE s_axilite port=ZA 
-#pragma HLS INTERFACE m_axi port=K  offset=slave bundle=gmem4 max_read_burst_length=256 max_write_burst_length=256 depth= 6
-#pragma HLS INTERFACE s_axilite port=K 
-#pragma HLS INTERFACE m_axi port=S  offset=slave bundle=gmem5 max_read_burst_length=256 max_write_burst_length=256 depth= 6
-#pragma HLS INTERFACE s_axilite port=S 
-#pragma HLS INTERFACE m_axi port=idx  offset=slave bundle=gmem6 max_read_burst_length=256 max_write_burst_length=256 depth= 4
-#pragma HLS INTERFACE s_axilite port=idx 
-// 2d array inputs
-#pragma HLS INTERFACE m_axi port=P  offset=slave bundle=gmem7 max_read_burst_length=256 max_write_burst_length=256 depth= 18
-#pragma HLS INTERFACE s_axilite port=P
-#pragma HLS INTERFACE m_axi port=PA offset=slave bundle=gmem8 max_read_burst_length=256 max_write_burst_length=256 depth= 18
-#pragma HLS INTERFACE s_axilite port=PA 
-#pragma HLS INTERFACE m_axi port=AB offset=slave bundle=gmem9 max_read_burst_length=256 max_write_burst_length=256 depth= 18
-#pragma HLS INTERFACE s_axilite port=AB 
+// cd
+#pragma HLS INTERFACE s_axilite port=lc 
+#pragma HLS INTERFACE s_axilite port=ld 
+#pragma HLS INTERFACE s_axilite port=nc 
+#pragma HLS INTERFACE s_axilite port=nd 
+#pragma HLS INTERFACE s_axilite port=mc 
+#pragma HLS INTERFACE s_axilite port=md
 
+// array inputs
+// ab
+#pragma HLS INTERFACE m_axi port=abZ  offset=slave bundle=gmem2 max_read_burst_length=256 max_write_burst_length=256 depth= 6  
+#pragma HLS INTERFACE s_axilite port=abZ 
+#pragma HLS INTERFACE m_axi port=abZA offset=slave bundle=gmem3 max_read_burst_length=256 max_write_burst_length=256 depth= 6
+#pragma HLS INTERFACE s_axilite port=abZA 
+#pragma HLS INTERFACE m_axi port=abK  offset=slave bundle=gmem4 max_read_burst_length=256 max_write_burst_length=256 depth= 6
+#pragma HLS INTERFACE s_axilite port=abK 
+#pragma HLS INTERFACE m_axi port=abS  offset=slave bundle=gmem5 max_read_burst_length=256 max_write_burst_length=256 depth= 6
+#pragma HLS INTERFACE s_axilite port=abS 
+#pragma HLS INTERFACE m_axi port=abidx  offset=slave bundle=gmem6 max_read_burst_length=256 max_write_burst_length=256 depth= 4
+#pragma HLS INTERFACE s_axilite port=abidx 
+// cd
+#pragma HLS INTERFACE m_axi port=cdZ  offset=slave bundle=gmem7 max_read_burst_length=256 max_write_burst_length=256 depth= 6  
+#pragma HLS INTERFACE s_axilite port=cdZ 
+#pragma HLS INTERFACE m_axi port=cdZA offset=slave bundle=gmem8 max_read_burst_length=256 max_write_burst_length=256 depth= 6
+#pragma HLS INTERFACE s_axilite port=cdZA 
+#pragma HLS INTERFACE m_axi port=cdK  offset=slave bundle=gmem9 max_read_burst_length=256 max_write_burst_length=256 depth= 6
+#pragma HLS INTERFACE s_axilite port=cdK 
+#pragma HLS INTERFACE m_axi port=cdS  offset=slave bundle=gmem10 max_read_burst_length=256 max_write_burst_length=256 depth= 6
+#pragma HLS INTERFACE s_axilite port=cdS 
+#pragma HLS INTERFACE m_axi port=cdidx  offset=slave bundle=gmem11 max_read_burst_length=256 max_write_burst_length=256 depth= 4
+#pragma HLS INTERFACE s_axilite port=cdidx 
+
+// 2d array inputs
+// ab
+#pragma HLS INTERFACE m_axi port=adP  offset=slave bundle=gmem12 max_read_burst_length=256 max_write_burst_length=256 depth= 18
+#pragma HLS INTERFACE s_axilite port=adP
+#pragma HLS INTERFACE m_axi port=adPA offset=slave bundle=gmem13 max_read_burst_length=256 max_write_burst_length=256 depth= 18
+#pragma HLS INTERFACE s_axilite port=adPA 
+#pragma HLS INTERFACE m_axi port=adAB offset=slave bundle=gmem14 max_read_burst_length=256 max_write_burst_length=256 depth= 18
+#pragma HLS INTERFACE s_axilite port=adAB 
+// cd
+#pragma HLS INTERFACE m_axi port=cdP  offset=slave bundle=gmem15 max_read_burst_length=256 max_write_burst_length=256 depth= 18
+#pragma HLS INTERFACE s_axilite port=cdP
+#pragma HLS INTERFACE m_axi port=cdPA offset=slave bundle=gmem16 max_read_burst_length=256 max_write_burst_length=256 depth= 18
+#pragma HLS INTERFACE s_axilite port=cdPA 
+#pragma HLS INTERFACE m_axi port=cdAB offset=slave bundle=gmem17 max_read_burst_length=256 max_write_burst_length=256 depth= 18
+#pragma HLS INTERFACE s_axilite port=cdAB
 
 #pragma HLS INTERFACE s_axilite port=return
 
@@ -72,41 +102,42 @@ void hrr_ssss(  int la, int lb, int na, int nb, int ma, int mb, std::array<doubl
     AB_nb = nb;
     AB_ma = ma;
     AB_mb = mb;
-    CD_la = la;
-    CD_lb = lb;
-    CD_na = na;
-    CD_nb = nb;
-    CD_ma = ma;
-    CD_mb = mb;
+    
+    CD_la = lc;
+    CD_lb = ld;
+    CD_na = nc;
+    CD_nb = nd;
+    CD_ma = mc;
+    CD_mb = md;
 
     for (int i = 0; i < 6; i++) {
-        AB_Z[i] = Z[i];
-        AB_ZA[i] = ZA[i];
-        AB_K[i] = K[i];
-        AB_S[i] = S[i];
+        AB_Z[i] = abZ[i];
+        AB_ZA[i] = abZA[i];
+        AB_K[i] = abK[i];
+        AB_S[i] = abS[i];
 
-        CD_Z[i] = Z[i];
-        CD_ZA[i] = ZA[i];
-        CD_K[i] = K[i];
-        CD_S[i] = S[i];
+        CD_Z[i] = cdZ[i];
+        CD_ZA[i] = cdZA[i];
+        CD_K[i] = cdK[i];
+        CD_S[i] = cdS[i];
     }
 
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 2; j++) {
-            AB_idx[i][j] = idx[i][j];
-            CD_idx[i][j] = idx[i][j];
+            AB_idx[i][j] = abidx[i][j];
+            CD_idx[i][j] = cdidx[i][j];
         }
     }
 
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 6; j++) {
-            AB_P[i][j] = P[i][j];
-            AB_PA[i][j] = PA[i][j];
-            AB_AB[i][j] = AB[i][j];
+            AB_P[i][j] = abP[i][j];
+            AB_PA[i][j] = abPA[i][j];
+            AB_AB[i][j] = abAB[i][j];
 
-            CD_P[i][j] = P[i][j];
-            CD_PA[i][j] = PA[i][j];
-            CD_AB[i][j] = AB[i][j];
+            CD_P[i][j] = cdP[i][j];
+            CD_PA[i][j] = cdPA[i][j];
+            CD_AB[i][j] = cdAB[i][j];
         }
     }
 
@@ -181,211 +212,4 @@ void hrr_ssss(  int la, int lb, int na, int nb, int ma, int mb, std::array<doubl
 }
 
 
-
-// void hrr_ssss(shell_pairs ab, shell_pairs cd,  double* I_ )
-// {
-//     double idx = threadIdx.x + blockDim.x * blockIdx.x;
-//     double idy = threadIdx.y + blockDim.y * blockIdx.y;
-
-
-//     double nab = ab.nab;
-//     double ncd = cd.nab;
-
-//     double mab = ab.ma * ab.mb; 
-//     double mcd = cd.ma * cd.mb; 
-
-//     if (idx < nab  and idy < ncd)
-//     {
-//     double AB[3] = 
-//     {
-//         ab.AB[0][idx],
-//         ab.AB[1][idx],
-//         ab.AB[2][idx]
-//     };
-//     double CD[3] = 
-//     {
-//         cd.AB[0][idy],
-//         cd.AB[1][idy],
-//         cd.AB[2][idy]
-//     };
-
-//     double s000_s000_s000_s000_0_con = 0.0;
-
-//     for (int pab = 0; pab < mab; pab++)
-//     for (int pcd = 0; pcd < mcd; pcd++)
-//     {
-//         double iab = idx + pab * nab; 
-//         double icd = idy + pcd * ncd; 
-
-//         double zab = ab.Z[iab];
-//         double zcd = cd.Z[icd];
-                              
-//         double zab_inv = 1 / zab;
-//         double zcd_inv = 1 / zcd;
-//         double zabcd_inv_sqrt = 1.0/(sqrt(zab + zcd));
-//         double zabcd_inv = zabcd_inv_sqrt * zabcd_inv_sqrt;
-//         double rho = zab * zcd * zabcd_inv;
-                                         
-//         double P[3] = 
-//         {
-//             ab.P[0][iab],
-//             ab.P[1][iab],
-//             ab.P[2][iab],
-//         };
-        
-//         double Q[3] = 
-//         {
-//             cd.P[0][icd],
-//             cd.P[1][icd],
-//             cd.P[2][icd],
-//         };
-        
-//         double T = rho * ((P[0]-Q[0])*(P[0]-Q[0]) + (P[1]-Q[1])*(P[1]-Q[1]) + (P[2]-Q[2])*(P[2]-Q[2]));
-//         double K = zabcd_inv_sqrt * (ab.K[iab]) * cd.K[icd]; 
-        
-//         double fm[1]; 
-//         // vgamma<double>(0, T, fm);
-        
-//         for (auto i = 0; i <1 ; i++) 
-//             fm[i] *= K;
-
-//         auto s000_s000_s000_s000_0 = fm[0] ;
-//         s000_s000_s000_s000_0_con += s000_s000_s000_s000_0;
-//         }
-//          //****************//
-//     I_[idx + (0 + 0 * 1 + 0 * 1 * 1 + 0 * 1 * 1 * 1) * nab + idy * nab * 1] =                 1 * s000_s000_s000_s000_0_con ;
-//     }
-// }
-
-// void hrr_psss(shell_pairs ab, shell_pairs cd,  double* I_ )
-// {
-//     double idx = threadIdx.x + blockDim.x * blockIdx.x; // idx for shell_pairs ab 
-//     double idy = threadIdx.y + blockDim.y * blockIdx.y; // idy for shell_pairs cd 
-
-//     double nab = ab.nab;
-//     double ncd = cd.nab;
-
-//     double mab = ab.ma * ab.mb; 
-//     double mcd = cd.ma * cd.mb; 
-
-//     if (idx < nab  and idy < ncd)
-//     {
-//     double AB[3] = 
-//     {
-//         ab.AB[0][idx],
-//         ab.AB[1][idx],
-//         ab.AB[2][idx]
-//     };
-//     double CD[3] = 
-//     {
-//         cd.AB[0][idy],
-//         cd.AB[1][idy],
-//         cd.AB[2][idy]
-//     };
-
-//     double p100_s000_s000_s000_0_con = 0.0;
-//     double p010_s000_s000_s000_0_con = 0.0;
-//     double p001_s000_s000_s000_0_con = 0.0;
-
-//     for (int pab = 0; pab < mab; pab++)
-//     for (int pcd = 0; pcd < mcd; pcd++)
-//     {
-//         double iab = idx + pab * nab; 
-//         double icd = idy + pcd * ncd; 
-                                    
-//         double zab = ab.Z[iab];
-//         double zcd = cd.Z[icd];
-                              
-//         double zab_inv = 1 / zab;
-//         double zcd_inv = 1 / zcd;
-//         double zabcd_inv_sqrt = 1.0/sqrt(zab + zcd);
-//         double zabcd_inv = zabcd_inv_sqrt * zabcd_inv_sqrt;
-//         double rho = zab * zcd * zabcd_inv;
-                                         
-//         double P[3] = 
-//         {
-//             ab.P[0][iab],
-//             ab.P[1][iab],
-//             ab.P[2][iab],
-//         };
-        
-//         double Q[3] = 
-//         {
-//             cd.P[0][icd],
-//             cd.P[1][icd],
-//             cd.P[2][icd],
-//         };
-        
-//         double PA[3] =
-//         {
-//             ab.PA[0][iab],
-//             ab.PA[1][iab],
-//             ab.PA[2][iab],
-//         };
-        
-//         double PB[3] =
-//         {
-//             ab.PA[0][iab] + ab.AB[0][iab],
-//             ab.PA[1][iab] + ab.AB[1][iab],
-//             ab.PA[2][iab] + ab.AB[2][iab],
-//         };
-        
-//         double QC[3] = 
-//         {
-//             cd.PA[0][icd],
-//             cd.PA[1][icd],
-//             cd.PA[2][icd],
-//         };
-        
-//         double QD[3] =
-//         {
-//             cd.PA[0][icd] + cd.AB[0][icd],
-//             cd.PA[1][icd] + cd.AB[1][icd],
-//             cd.PA[2][icd] + cd.AB[2][icd],
-//         };
-        
-//         double W[3] =
-//         {
-//             (zab * P[0] + zcd * Q[0]) * zabcd_inv,
-//             (zab * P[1] + zcd * Q[1]) * zabcd_inv,
-//             (zab * P[2] + zcd * Q[2]) * zabcd_inv,
-//         };
-//         double WP[3] =
-//         {
-//             W[0] - P[0],
-//             W[1] - P[1],
-//             W[2] - P[2]
-//         };
-        
-//         double WQ[3] =
-//         {
-//             W[0] - Q[0],
-//             W[1] - Q[1],
-//             W[2] - Q[2]
-//         };
-        
-//         double T = rho * ((P[0]-Q[0])*(P[0]-Q[0]) + (P[1]-Q[1])*(P[1]-Q[1]) + (P[2]-Q[2])*(P[2]-Q[2]));
-//         double K = zabcd_inv_sqrt * (ab.K[iab]) * cd.K[icd]; 
-        
-//         double fm[2]; 
-//         // vgamma<double>(1, T, fm);
-        
-//         for (auto i = 0; i <2 ; i++) 
-//             fm[i] *= K;
-
-//         double s000_s000_s000_s000_0 = fm[0] ;
-//         double s000_s000_s000_s000_1 = fm[1] ;
-//         double p100_s000_s000_s000_0 = PA[0] * s000_s000_s000_s000_0 + WP[0] * s000_s000_s000_s000_1;
-//         double p010_s000_s000_s000_0 = PA[1] * s000_s000_s000_s000_0 + WP[1] * s000_s000_s000_s000_1;
-//         double p001_s000_s000_s000_0 = PA[2] * s000_s000_s000_s000_0 + WP[2] * s000_s000_s000_s000_1;
-//         p100_s000_s000_s000_0_con += p100_s000_s000_s000_0;
-//         p010_s000_s000_s000_0_con += p010_s000_s000_s000_0;
-//         p001_s000_s000_s000_0_con += p001_s000_s000_s000_0;
-//         }
-//          //****************//
-//     I_[idx + (0 + 0 * 3 + 0 * 3 * 1 + 0 * 3 * 1 * 1) * nab + idy * nab * 3] =                 1 * p100_s000_s000_s000_0_con ;
-//     I_[idx + (1 + 0 * 3 + 0 * 3 * 1 + 0 * 3 * 1 * 1) * nab + idy * nab * 3] =                 1 * p010_s000_s000_s000_0_con ;
-//     I_[idx + (2 + 0 * 3 + 0 * 3 * 1 + 0 * 3 * 1 * 1) * nab + idy * nab * 3] =                 1 * p001_s000_s000_s000_0_con ;
-//     }
-// }
 
